@@ -1,0 +1,22 @@
+<!-- Decoders personalizados Caso C19 - Pipeline Sur DevOps S.A.S. -->
+<!-- Autor: Anderson Estiven Mendez Lascarro -->
+
+<decoder name="c19-cloud-audit">
+  <program_name>c19-cloud-api</program_name>
+</decoder>
+
+<decoder name="c19-cloud-audit-fields">
+  <parent>c19-cloud-audit</parent>
+  <regex type="pcre2">event=(\S+)\s+user=(\S+)\s+srcip=(\S+)\s+status=(\S+)</regex>
+  <order>action, dstuser, srcip, status</order>
+</decoder>
+
+<decoder name="kaspersky-cef">
+  <prematch type="pcre2">CEF:\d\|Kaspersky\|</prematch>
+</decoder>
+
+<decoder name="kaspersky-cef-fields">
+  <parent>kaspersky-cef</parent>
+  <regex type="pcre2">CEF:\d\|Kaspersky\|([^|]*)\|([^|]*)\|([^|]*)\|([^|]*)\|([^|]*)\|</regex>
+  <order>product, version, signature_id, event_name, severity</order>
+</decoder>

@@ -1,0 +1,50 @@
+<!-- Reglas personalizadas Caso C19 - Pipeline Sur DevOps S.A.S. -->
+<!-- Autor: Anderson Estiven Mendez Lascarro -->
+
+<group name="local,c19_pipeline_sur,">
+
+  <!-- Escenario 1 C19: Uso anomalo de credenciales cloud desde IP inusual -->
+  <rule id="100191" level="10">
+    <decoded_as>c19-cloud-audit</decoded_as>
+    <field name="status">UNUSUAL_IP</field>
+    <description>C19 Alerta Cloud: Uso anomalo de credenciales IAM por $(dstuser) desde IP no autorizada $(srcip)</description>
+    <group>cloud_security,authentication_failures,</group>
+  </rule>
+
+  <!-- Escenario 2 C19: Creacion de usuario cloud privilegiado nuevo -->
+  <rule id="100192" level="12">
+    <decoded_as>c19-cloud-audit</decoded_as>
+    <field name="action">CreateAdminUser</field>
+    <description>C19 Alerta Critica Cloud: Se creo un usuario IAM con permisos de Administrador por $(dstuser) desde $(srcip)</description>
+    <group>cloud_security,adduser,privilege_escalation,</group>
+  </rule>
+
+  <!-- Escenario 3 C19: Cambio critico FIM en archivo de credenciales del Bastion -->
+  <rule id="100193" level="12">
+    <if_sid>550,554</if_sid>
+    <match>.aws/credentials</match>
+    <description>C19 Alerta Critica FIM: Modificacion o creacion del archivo de llaves cloud (.aws/credentials) en Bastion</description>
+    <group>syscheck,credential_access,</group>
+  </rule>
+
+  <!-- Regla 4: Inicio de sesion exitoso fuera de horario laboral -->
+  <rule id="100194" level="10">
+    <if_sid>5715,60106</if_sid>
+    <time>7 pm - 6 am</time>
+    <description>C19 Politica: Inicio de sesion exitoso fuera del horario laboral permitido</description>
+    <group>authentication_success,policy_violation,</group>
+  </rule>
+
+  <!-- Reglas de integracion Kaspersky EDR via CEF -->
+  <rule id="100200" level="6">
+    <decoded_as>kaspersky-cef</decoded_as>
+    <description>Kaspersky EDR: $(event_name) [Evento: $(signature_id)]</description>
+  </rule>
+
+  <rule id="100201" level="12">
+    <if_sid>100200</if_sid>
+    <match>EICAR-Test-File|VirTool|Trojan|Ransom</match>
+    <description>Kaspersky EDR ALERTA ALTA: Deteccion de malware $(event_name) puesto en cuarentena</description>
+  </rule>
+
+</group>
